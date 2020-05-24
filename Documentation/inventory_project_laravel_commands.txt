@@ -1,0 +1,133 @@
+-Install WampServer or Xamp with PHP => 7.2 and mysql 
+
+-Install Visual Studio Code
+
+-Install extension to Visual Studio Code(for CSS, php, etc)
+Go to extension ctrl + shift + X
+Install Bootstrap v4 snippets
+Install intellisense for css class
+Install Laravel 5 Snippets
+Install PHP Intelephense
+
+-Install composer
+https://getcomposer.org/Composer-Setup.exe
+
+-Install laravel 
+composer global require laravel/installer
+
+-create laravel project
+laravel new inventory_management
+
+-create laravel project with composer
+composer create-project --prefer-dist laravel/laravel inventory_management
+ 
+-create mysql database
+access to localhost/phpmyadmin and create a database ex:inventory_management
+update .env file in your project
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3308
+DB_DATABASE=inventory_management
+DB_USERNAME=root
+DB_PASSWORD=
+
+-add function to app\Providers\AppServiceProvider.php file
+public function boot()
+{
+   Schema::defaultStringLength(191);
+}
+
+-migrate tables in terminal with php artisan
+php artisan migrate
+
+-create a model in terminal with php artisan(-mcr = modelo, controlador y recursos)
+php artisan make:model products -mcr
+            $table->bigIncrements('id')->unique()->index();
+            $table->text('name');
+            $table->text('alias');
+            $table->text('brand');
+            $table->text('provider');
+            $table->timestamps();
+
+
+php artisan make:model companies -mcr
+            $table->bigIncrements('id')->unique()->index()->autoIncrement();
+            $table->text('name');
+            $table->text('logo');
+            $table->text('address');
+            $table->text('details');
+            $table->timestamps();
+
+php artisan make:model movements_types -mcr
+            $table->bigIncrements('id')->unique()->index()->autoIncrement();
+			$table->text('name');
+			$table->string('alias')->unique()->index();
+            $table->timestamps();
+			
+php artisan make:model supervisers -mcr
+            $table->bigIncrements('id')->unique()->index()->autoIncrement();
+			$table->text('name');
+			$table->string('identification')->unique()->index();
+			$table->text('signature');
+            $table->timestamps();
+			
+php artisan make:model movements -mcr
+            $table->bigIncrements('id')->unique()->index()->autoIncrement();
+            $table->unsignedBigInteger('movements_type_id');
+			$table->foreign('movements_type_id')->references('id')->on('movements_types');
+			$table->date('entry_date');
+			$table->string('entry_quantity');
+			$table->string('entry_unit');
+			$table->string('invoice_number');
+			$table->string('provider_name');
+			$table->string('permission_number');
+			$table->date('exit_date');
+			$table->string('exit_quantity');
+			$table->string('exit_unit');
+			$table->text('observations');
+			$table->unsignedBigInteger('superviser_id');
+			$table->foreign('superviser_id')->references('id')->on('supervisers');
+			$table->timestamps();
+			
+Then execute (maybe you firts have to delete al tables)
+php artisan migrate:refresh
+
+-Add routes of controllers to web.php file
+
+Route::resource('products', "ProductsController");
+Route::resource('companies', "CompaniesController");
+Route::resource('movements_types', "MovementsTypesController");
+Route::resource('supervisers', "SupervisersController");
+Route::resource('movements', "MovementsController");
+
+-Install Material Desing Theme
+Via composer, Cd to your Laravel app and then execute:
+composer require laravel-frontend-presets/material-dashboard
+php artisan preset material
+composer dump-autoload
+php artisan migrate --seed
+
+-Install laravelcollective for Blade components in the terminal
+composer require laravelcollective/html
+
+-Create Reports Controller
+php artisan make:controller MovementReports
+
+-Install excel for reports
+
+composer require maatwebsite/excel
+in config/app.php add :
+'aliases' => [
+    ...
+    'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+]
+'providers' => [
+    /*
+     * Package Service Providers...
+     */
+    Maatwebsite\Excel\ExcelServiceProvider::class,
+]
+php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider"
+
+
+
